@@ -1,9 +1,15 @@
 import open3d as o3d
 import sys
 import os
+import argparse
 
 def main():
-    ply_file = "./7.ply"
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description='View PLY point cloud file.')
+    parser.add_argument('ply_file', type=str, help='Path to the PLY file')
+    args = parser.parse_args()
+
+    ply_file = args.ply_file
 
     # Check if the file exists
     if not os.path.isfile(ply_file):
@@ -30,12 +36,12 @@ def main():
     # Visualize the point cloud
     print("Visualizing the point cloud...")
     o3d.visualization.draw_geometries([point_cloud],
-                                      window_name='Open3D - PLY Viewer',
-                                      width=800,
-                                      height=600,
-                                      left=50,
-                                      top=50,
-                                      point_show_normal=False)
+                                    window_name='Open3D - PLY Viewer',
+                                    width=800,
+                                    height=600,
+                                    left=50,
+                                    top=50,
+                                    point_show_normal=False)
 
 if __name__ == "__main__":
     main()
