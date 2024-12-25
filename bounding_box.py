@@ -1,8 +1,8 @@
 import open3d as o3d
 import numpy as np
 
-sample_ply_data = o3d.data.PLYPointCloud()
-pcd = o3d.io.read_point_cloud(sample_ply_data.path)
+# sample_ply_data = o3d.data.PLYPointCloud()
+# pcd = o3d.io.read_point_cloud(sample_ply_data.path)
 
 demo_crop_data = o3d.data.DemoCropPointCloud()
 pcd = o3d.io.read_point_cloud(demo_crop_data.point_cloud_path)
