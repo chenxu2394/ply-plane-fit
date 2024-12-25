@@ -4,7 +4,7 @@ import open3d as o3d
 # pcd = o3d.io.read_point_cloud(dataset.path)
 # assert (pcd.has_normals())
 
-pcd = o3d.io.read_point_cloud("data/6.ply")
+pcd = o3d.io.read_point_cloud("data/8.ply")
 
 # using all defaults
 oboxes = pcd.detect_planar_patches(
@@ -31,4 +31,4 @@ geometries.append(pcd)
 #                                   lookat=[2.4947, 1.7728, 1.5541],
 #                                   up=[-0.1726, -0.9630, 0.2071])
 
-o3d.visualization.draw_geometries([pcd])
+o3d.visualization.draw_geometries(geometries)
