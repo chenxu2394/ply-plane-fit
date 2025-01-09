@@ -1,12 +1,9 @@
 import open3d as o3d
-
-# dataset = o3d.data.PCDPointCloud()
-# pcd = o3d.io.read_point_cloud(dataset.path)
-# assert (pcd.has_normals())
+import numpy as np
 
 pcd = o3d.io.read_point_cloud("data/8.ply")
 
-# using all defaults
+# Detect planar patches
 oboxes = pcd.detect_planar_patches(
     normal_variance_threshold_deg=60,
     coplanarity_deg=85,
@@ -17,20 +14,38 @@ oboxes = pcd.detect_planar_patches(
 
 print("Detected {} patches".format(len(oboxes)))
 
+# Keep only first 3 planes
 oboxes = oboxes[0:3]
 
+# Get points that belong to these 3 planes
+points = np.asarray(pcd.points)
+keep_indices = []
+
 geometries = []
+
 for obox in oboxes:
+    # Transform points to local coordinate system of the oriented box
+    points_local = np.asarray(points) - np.asarray(obox.center)
+    points_local = np.dot(points_local, np.asarray(obox.R))
+    
+    # Check which points are within the box bounds
+    half_extent = np.asarray(obox.extent) / 2
+    mask = np.all(np.abs(points_local) <= half_extent, axis=1)
+    keep_indices.extend(np.where(mask)[0])
+
     mesh = o3d.geometry.TriangleMesh.create_from_oriented_bounding_box(obox, scale=[1, 1, 0.0001])
     mesh.paint_uniform_color(obox.color)
     geometries.append(mesh)
     geometries.append(obox)
-geometries.append(pcd)
 
-# o3d.visualization.draw_geometries(geometries,
-#                                   zoom=0.62,
-#                                   front=[0.4361, -0.2632, -0.8605],
-#                                   lookat=[2.4947, 1.7728, 1.5541],
-#                                   up=[-0.1726, -0.9630, 0.2071])
+# Remove duplicates from indices
+keep_indices = list(set(keep_indices))
 
-o3d.visualization.draw_geometries(geometries)
+# Create new point cloud with only points from the 3 planes
+filtered_pcd = pcd.select_by_index(keep_indices)
+
+bounded_box = filtered_pcd.get_oriented_bounding_box()
+bounded_box.color = (1, 0, 0)
+
+# Visualize
+o3d.visualization.draw_geometries([pcd, bounded_box, *geometries])
