@@ -9,13 +9,15 @@ pcd = o3d.io.read_point_cloud("data/8.ply")
 # using all defaults
 oboxes = pcd.detect_planar_patches(
     normal_variance_threshold_deg=60,
-    coplanarity_deg=75,
+    coplanarity_deg=85,
     outlier_ratio=0.75,
     min_plane_edge_length=0,
     min_num_points=0,
     search_param=o3d.geometry.KDTreeSearchParamKNN(knn=30))
 
 print("Detected {} patches".format(len(oboxes)))
+
+oboxes = oboxes[0:3]
 
 geometries = []
 for obox in oboxes:
