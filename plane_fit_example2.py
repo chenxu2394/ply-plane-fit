@@ -47,5 +47,21 @@ filtered_pcd = pcd.select_by_index(keep_indices)
 bounded_box = filtered_pcd.get_oriented_bounding_box()
 bounded_box.color = (1, 0, 0)
 
-# Visualize
-o3d.visualization.draw_geometries([pcd, bounded_box, *geometries])
+# Instead of one draw_geometries call:
+vis = o3d.visualization.Visualizer()
+vis.create_window()
+
+# Add point cloud separately so we can specify its point size
+vis.add_geometry(pcd)
+
+# Add other geometries normally
+vis.add_geometry(bounded_box)
+for g in geometries:
+    vis.add_geometry(g)
+
+# Adjust render option
+render_opt = vis.get_render_option()
+render_opt.point_size = 1.8  # smaller points for pcd
+
+vis.run()
+vis.destroy_window()
