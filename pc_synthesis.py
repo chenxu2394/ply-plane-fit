@@ -53,8 +53,6 @@ ground_pcd = o3d.geometry.PointCloud()
 ground_pcd.points = o3d.utility.Vector3dVector(ground_points)
 ground_pcd.paint_uniform_color([0.8, 0.8, 0.8])  # Light gray color
 
-# Generate multiple boxes
-all_pcds = []
 # Create boxes using stored positions
 all_pcds = []
 for x, z, width, height, depth in box_positions:
@@ -69,4 +67,45 @@ combined_pcd = ground_pcd
 for pcd in all_pcds:
     combined_pcd += pcd
 
-o3d.visualization.draw_geometries([combined_pcd])
+# Define camera parameters
+camera_height = 5.0  # Height of drone
+camera_position = np.array([0, camera_height, -5])  # Drone position
+camera_target = np.array([0, 0, 0])  # Looking at center of scene
+camera_up = np.array([0, 1, 0])  # Up direction
+fov = 60  # Field of view in degrees
+aspect = 1.0
+near = 0.1
+far = 20
+
+# # Create view and projection matrices
+# view = np.array(o3d.camera.create_look_at(
+#     camera_position,
+#     camera_target,
+#     camera_up
+# ))
+
+# Create pinhole camera parameters
+intrinsic = o3d.camera.PinholeCameraIntrinsic()
+intrinsic.set_intrinsics(
+    width=640, height=480,
+    fx=580, fy=580,
+    cx=320, cy=240
+)
+
+# Create hidden point removal operator
+radius = 2000
+_, pt_map = combined_pcd.hidden_point_removal(camera_position, radius)
+
+# Create new point cloud with only visible points
+visible_pcd = combined_pcd.select_by_index(pt_map)
+
+# # Visualize
+# o3d.visualization.draw_geometries([visible_pcd])
+
+# Visualize camera position
+camera_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.2)
+camera_sphere.translate(camera_position)
+camera_sphere.paint_uniform_color([1, 0, 0])  # Red color for camera
+
+# Visualize scene with camera position
+o3d.visualization.draw_geometries([visible_pcd, camera_sphere])
