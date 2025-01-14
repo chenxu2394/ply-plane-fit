@@ -67,6 +67,9 @@ combined_pcd = ground_pcd
 for pcd in all_pcds:
     combined_pcd += pcd
 
+# Visualize
+o3d.visualization.draw_geometries([combined_pcd])
+
 # Define camera parameters
 camera_height = 5.0  # Height of drone
 camera_position = np.array([0, camera_height, -5])  # Drone position
